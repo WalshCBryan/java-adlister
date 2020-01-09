@@ -1,3 +1,5 @@
+package controller;
+
 public class DaoFactory {
     private static Ads adsDao;
 
