@@ -15,6 +15,7 @@ public class AdminServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
         String sessionCode = (String) request.getSession().getAttribute("access_code");
         String requestCode = (String) request.getParameter("code");
         System.out.println(sessionCode);
