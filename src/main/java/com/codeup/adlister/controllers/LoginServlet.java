@@ -1,5 +1,10 @@
 package com.codeup.adlister.controllers;
 
+import com.codeup.adlister.dao.DaoFactory;
+import com.codeup.adlister.dao.MySQLUsersDao;
+import com.codeup.adlister.models.User;
+import org.mindrot.jbcrypt.BCrypt;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -20,15 +25,34 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
+        User user = DaoFactory.getUsersDao().findByUsername(username);
+
+        boolean passwordsMatch = BCrypt.checkpw(password, DaoFactory.getUsersDao().findByUsername(username).getPassword());
 
         // TODO: find a record in your database that matches the submitted password
         // TODO: make sure we find a user with that username
         // TODO: check the submitted password against what you have in your database
         boolean validAttempt = false;
 
+        if (DaoFactory.getUsersDao().findByUsername(username) != null) {
+            if (username.equals(DaoFactory.getUsersDao().findByUsername(username).getUsername())
+                    && passwordsMatch) {
+                validAttempt = true;
+            } else {
+                response.sendRedirect("/login");
+                return;
+            }
+        }
+
+            request.setAttribute("isLoggedin", validAttempt);
+
+            request.getSession().setAttribute("user",user);
+
+
+
         if (validAttempt) {
             // TODO: store the logged in user object in the session, instead of just the username
-            request.getSession().setAttribute("user", username);
+            request.getSession().setAttribute("user", DaoFactory.getUsersDao().findByUsername(username));
             response.sendRedirect("/profile");
         } else {
             response.sendRedirect("/login");
